@@ -17,10 +17,24 @@
       content="进入梦幻棋室，和原创棋手澪进行一场五子棋对决。"
     />
     <meta property="og:url" content="https://lulisslce.cc.cd/" />
+    <meta name="build-version" content="20260730-intersections-v2" />
     <title>棋境少女｜在线五子棋</title>
-    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/styles.css" />
-    <script type="module" src="/js/app.js"></script>
+    <link rel="icon" href="/assets/favicon.svg?v=20260730-2" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css?v=20260730-2" />
+    <style>
+      /*
+       * Critical board alignment is kept inline so an older cached stylesheet
+       * can never move stones back into the middle of the squares.
+       */
+      .game-board {
+        background-position:
+          calc(100% / 30) calc(100% / 30),
+          calc(100% / 30) calc(100% / 30),
+          center !important;
+        background-repeat: repeat, repeat, no-repeat !important;
+      }
+    </style>
+    <script type="module" src="/js/app.js?v=20260730-2"></script>
   </head>
   <body>
     <a class="skip-link" href="#game">跳到棋盘</a>
