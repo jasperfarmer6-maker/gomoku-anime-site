@@ -9,6 +9,7 @@ import {
   placeStone,
 } from "./game-engine.js";
 import { chooseAIMove } from "./ai.js";
+import { OPPONENTS, getWinProgress, normalizeLevel } from "./campaign.js";
 
 const STORAGE_KEY = "animeGomoku.stats.v1";
 const AUDIO_KEY = "animeGomoku.audio.v1";
@@ -22,11 +23,21 @@ const winsElement = document.querySelector("#wins");
 const lossesElement = document.querySelector("#losses");
 const drawsElement = document.querySelector("#draws");
 const mascot = document.querySelector("#mascot");
+const mascotStage = document.querySelector(".mascot-stage");
 const mascotBubble = document.querySelector("#mascot-bubble");
+const levelLabel = document.querySelector("#level-label");
+const opponentName = document.querySelector("#opponent-name");
+const opponentTitle = document.querySelector("#opponent-title");
+const opponentRank = document.querySelector("#opponent-rank");
+const boardOpponentName = document.querySelector("#board-opponent-name");
+const campaignProgress = document.querySelector("#campaign-progress");
+const eyebrowLevel = document.querySelector("#eyebrow-level");
 const resultOverlay = document.querySelector("#result-overlay");
+const resultKicker = document.querySelector("#result-kicker");
 const resultTitle = document.querySelector("#result-title");
 const resultCopy = document.querySelector("#result-copy");
 const resultButton = document.querySelector("#result-button");
+const saveRestButton = document.querySelector("#save-rest-button");
 
 let board = createBoard();
 let gameOver = false;
@@ -35,8 +46,11 @@ let lastMove = null;
 let focusedIndex = Math.floor(BOARD_SIZE / 2) * BOARD_SIZE + Math.floor(BOARD_SIZE / 2);
 let audioEnabled = JSON.parse(localStorage.getItem(AUDIO_KEY) ?? "true");
 let stats = loadStats();
+let currentLevel = normalizeLevel(stats.currentLevel);
+let currentOpponent = OPPONENTS[currentLevel];
 let mercyGame = stats.mercyPending;
 let aiTimer = null;
+let resultAction = "retry";
 
 function loadStats() {
   const defaults = {
@@ -45,10 +59,20 @@ function loadStats() {
     draws: 0,
     consecutiveLosses: 0,
     mercyPending: false,
+    currentLevel: 0,
+    completedLevels: [],
+    campaignComplete: false,
   };
 
   try {
-    return { ...defaults, ...JSON.parse(localStorage.getItem(STORAGE_KEY)) };
+    const saved = { ...defaults, ...JSON.parse(localStorage.getItem(STORAGE_KEY)) };
+    saved.currentLevel = normalizeLevel(saved.currentLevel);
+    saved.completedLevels = Array.isArray(saved.completedLevels)
+      ? saved.completedLevels
+          .map(normalizeLevel)
+          .filter((level, index, levels) => levels.indexOf(level) === index)
+      : [];
+    return saved;
   } catch {
     return defaults;
   }
@@ -61,6 +85,55 @@ function saveStats() {
 function setMascotMood(mood, message) {
   mascot.dataset.mood = mood;
   mascotBubble.textContent = message;
+}
+
+function renderCampaignProgress() {
+  campaignProgress.replaceChildren();
+  OPPONENTS.forEach((opponent, index) => {
+    const item = document.createElement("span");
+    item.className = "campaign-step";
+    item.dataset.state =
+      index === currentLevel
+        ? "current"
+        : stats.completedLevels.includes(index)
+          ? "complete"
+          : "locked";
+    item.textContent = String(index + 1);
+    item.title = `第 ${index + 1} 关 · ${opponent.name}`;
+    item.setAttribute(
+      "aria-label",
+      `${item.title}，${
+        item.dataset.state === "complete"
+          ? "已通过"
+          : item.dataset.state === "current"
+            ? "当前关卡"
+            : "尚未解锁"
+      }`,
+    );
+    campaignProgress.append(item);
+  });
+}
+
+function updateOpponent() {
+  currentLevel = normalizeLevel(currentLevel);
+  currentOpponent = OPPONENTS[currentLevel];
+
+  levelLabel.textContent = `第 ${currentLevel + 1} / ${OPPONENTS.length} 关`;
+  eyebrowLevel.textContent = `GAME ${String(currentLevel + 1).padStart(2, "0")}`;
+  opponentName.innerHTML = `${currentOpponent.name} <span>${currentOpponent.roman}</span>`;
+  opponentTitle.textContent = currentOpponent.title;
+  opponentRank.textContent = currentOpponent.rank;
+  boardOpponentName.textContent = currentOpponent.name;
+  mascot.dataset.opponent = currentOpponent.id;
+  mascotStage.dataset.opponent = currentOpponent.id;
+  mascot.setAttribute("aria-label", `原创女性动漫棋手 ${currentOpponent.name}`);
+  mascot.querySelector(".avatar-emblem").textContent =
+    currentOpponent.id === "daolong"
+      ? "刃"
+      : currentOpponent.id === "afu"
+        ? "福"
+        : currentOpponent.name.slice(0, 1).toUpperCase();
+  renderCampaignProgress();
 }
 
 function setStatus(message, state = "ready") {
@@ -149,13 +222,33 @@ function finishGame(result) {
   aiThinking = false;
 
   if (result === "player") {
+    const progress = getWinProgress(currentLevel);
     stats.wins += 1;
     stats.consecutiveLosses = 0;
     stats.mercyPending = false;
+    if (!stats.completedLevels.includes(currentLevel)) {
+      stats.completedLevels.push(currentLevel);
+    }
     setStatus("胜利！这一手漂亮。", "win");
-    setMascotMood("surprised", "欸？！这条线是什么时候连起来的！");
-    resultTitle.textContent = "YOU WIN!";
-    resultCopy.textContent = "五颗黑子连成一线。棋盘记住了你的名字。";
+    setMascotMood("surprised", currentOpponent.surprised);
+    resultKicker.textContent = `STAGE ${currentLevel + 1} CLEAR`;
+    saveRestButton.hidden = false;
+
+    if (progress.isFinal) {
+      stats.campaignComplete = true;
+      stats.currentLevel = currentLevel;
+      resultAction = "restart-campaign";
+      resultTitle.textContent = "五关通关！";
+      resultCopy.textContent = "你击败了阿福，完成棋境少女的全部五关。要重新挑战，还是存档休息？";
+      resultButton.innerHTML = '重新挑战五关 <span aria-hidden="true">→</span>';
+    } else {
+      stats.currentLevel = progress.nextLevel;
+      resultAction = "next-level";
+      const nextOpponent = OPPONENTS[progress.nextLevel];
+      resultTitle.textContent = `${currentOpponent.name} · 突破`;
+      resultCopy.textContent = `第 ${currentLevel + 1} 关完成。下一位对手是 ${nextOpponent.name}，现在继续还是存档休息？`;
+      resultButton.innerHTML = `进入第 ${progress.nextLevel + 1} 关 <span aria-hidden="true">→</span>`;
+    }
     playTone(784, 0.16, "square", 0.05);
     window.setTimeout(() => playTone(1046, 0.22, "square", 0.045), 90);
   } else if (result === "ai") {
@@ -163,16 +256,24 @@ function finishGame(result) {
     stats.consecutiveLosses += 1;
     if (stats.consecutiveLosses >= 2) stats.mercyPending = true;
     setStatus("本局惜败，再来一次？", "lose");
-    setMascotMood("smug", "承让啦。再下一局，我可不会大意……");
+    setMascotMood("smug", currentOpponent.smug);
+    resultKicker.textContent = `STAGE ${currentLevel + 1}`;
     resultTitle.textContent = "TRY AGAIN";
-    resultCopy.textContent = "白子先连成五颗。观察交叉点，再挑战一次吧。";
+    resultCopy.textContent = `${currentOpponent.name} 的白子先连成五颗。观察交叉点，再挑战本关吧。`;
+    resultAction = "retry";
+    resultButton.innerHTML = '重试本关 <span aria-hidden="true">→</span>';
+    saveRestButton.hidden = true;
     playTone(196, 0.25, "sawtooth", 0.035);
   } else {
     stats.draws += 1;
     setStatus("棋盘已满，平局！", "draw");
     setMascotMood("happy", "能下满整张棋盘，也是一种默契。");
+    resultKicker.textContent = `STAGE ${currentLevel + 1}`;
     resultTitle.textContent = "DRAW";
     resultCopy.textContent = "没有空位了。这是一场势均力敌的对局。";
+    resultAction = "retry";
+    resultButton.innerHTML = '重试本关 <span aria-hidden="true">→</span>';
+    saveRestButton.hidden = true;
     playTone(440, 0.18, "triangle", 0.04);
   }
 
@@ -204,7 +305,7 @@ function onPlayerMove(event) {
 
   aiThinking = true;
   setStatus("AI 正在计算落点…", "thinking");
-  setMascotMood("thinking", "让我看看……你这一步很有想法。");
+  setMascotMood("thinking", currentOpponent.thinking);
   renderBoard();
   aiTimer = window.setTimeout(runAI, 260 + Math.random() * 240);
 }
@@ -215,7 +316,10 @@ function runAI() {
 
   let move = null;
   try {
-    move = chooseAIMove(board, { mercy: mercyGame });
+    move = chooseAIMove(board, {
+      mercy: mercyGame,
+      skill: currentOpponent.skill,
+    });
   } catch (error) {
     console.error("AI 落子计算失败，将使用备用落点。", error);
   }
@@ -258,7 +362,7 @@ function runAI() {
   }
 
   setStatus("轮到你了 · 黑子", "ready");
-  setMascotMood("happy", "轮到你了。让我看看你的下一手。");
+  setMascotMood("happy", currentOpponent.turn);
   renderBoard();
 }
 
@@ -274,9 +378,46 @@ function newGame() {
   mercyGame = stats.mercyPending;
   focusedIndex = Math.floor(BOARD_SIZE / 2) * BOARD_SIZE + Math.floor(BOARD_SIZE / 2);
   if (resultOverlay.open) resultOverlay.close();
+  updateOpponent();
   setStatus("轮到你了 · 黑子", "ready");
-  setMascotMood("happy", "初次见面，我是澪。请先落子吧！");
+  setMascotMood("happy", currentOpponent.intro);
   renderBoard();
+}
+
+function handleResultAction() {
+  if (resultAction === "next-level") {
+    currentLevel = normalizeLevel(stats.currentLevel);
+    newGame();
+    return;
+  }
+
+  if (resultAction === "restart-campaign") {
+    currentLevel = 0;
+    stats.currentLevel = 0;
+    stats.completedLevels = [];
+    stats.campaignComplete = false;
+    saveStats();
+    newGame();
+    return;
+  }
+
+  newGame();
+}
+
+function saveAndRest() {
+  saveStats();
+
+  if (stats.campaignComplete) {
+    if (resultOverlay.open) resultOverlay.close();
+    setStatus("五关已通关，进度已存档。", "win");
+    setMascotMood("happy", "随时回来，我会在最终关等你。");
+    return;
+  }
+
+  currentLevel = normalizeLevel(stats.currentLevel);
+  newGame();
+  setStatus(`已存档 · 第 ${currentLevel + 1} 关等待挑战`, "ready");
+  setMascotMood("happy", `${currentOpponent.name} 已在棋盘前等你回来。`);
 }
 
 function moveFocus(deltaRow, deltaCol) {
@@ -303,7 +444,8 @@ boardElement.addEventListener("keydown", (event) => {
 });
 
 restartButton.addEventListener("click", newGame);
-resultButton.addEventListener("click", newGame);
+resultButton.addEventListener("click", handleResultAction);
+saveRestButton.addEventListener("click", saveAndRest);
 audioButton.addEventListener("click", () => {
   audioEnabled = !audioEnabled;
   localStorage.setItem(AUDIO_KEY, JSON.stringify(audioEnabled));

@@ -1259,6 +1259,12 @@ footer {
   }
 }
 
+@media (min-width: 821px) and (max-width: 1180px) {
+  .info-panel {
+    grid-template-columns: 1fr 0.85fr 1.2fr 0.85fr;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -1856,4 +1862,340 @@ h1 em {
 
 .character-name span {
   color: #d9b6ff;
+}
+
+/* Five-stage campaign */
+.campaign-progress {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+  margin-top: 14px;
+}
+
+.campaign-step {
+  display: grid;
+  min-width: 0;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: #6d7898;
+  font-size: 0.58rem;
+  font-weight: 800;
+}
+
+.campaign-step[data-state="current"] {
+  border-color: var(--cyan);
+  background: rgba(88, 236, 255, 0.11);
+  box-shadow: 0 0 13px rgba(88, 236, 255, 0.22);
+  color: var(--cyan);
+}
+
+.campaign-step[data-state="complete"] {
+  border-color: var(--pink);
+  background: rgba(255, 146, 197, 0.11);
+  color: #ffc3df;
+}
+
+.result-actions {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.result-actions .pixel-button {
+  min-width: 138px;
+}
+
+.avatar-emblem,
+.hair-accessory {
+  position: absolute;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+}
+
+.avatar-emblem {
+  top: 22px;
+  right: 20px;
+  width: 29px;
+  height: 29px;
+  border: 2px solid rgba(255, 255, 255, 0.72);
+  border-radius: 50%;
+  background: #5e65a7;
+  box-shadow: 0 0 16px rgba(125, 231, 255, 0.45);
+  color: white;
+  font-size: 0.63rem;
+  font-weight: 900;
+}
+
+.hair-accessory {
+  pointer-events: none;
+}
+
+/* Kim — warm gold hair and a neon hair clip. */
+.mascot-stage[data-opponent="kim"] {
+  background:
+    radial-gradient(circle at 52% 20%, rgba(255, 226, 135, 0.23), transparent 30%),
+    linear-gradient(145deg, rgba(61, 220, 255, 0.14), transparent 55%),
+    #10172d;
+}
+
+.mascot[data-opponent="kim"] .mascot-hair-back {
+  background: linear-gradient(145deg, #ffe29a, #d3984e 68%, #87552b);
+  box-shadow:
+    -8px 12px 0 #a96e35,
+    8px 13px 0 #a96e35,
+    0 0 0 2px rgba(255, 235, 174, 0.22);
+}
+
+.mascot[data-opponent="kim"] .mascot-bangs {
+  background: linear-gradient(145deg, #fff0b7, #d59b50 72%);
+}
+
+.mascot[data-opponent="kim"] .hair-tail {
+  background: linear-gradient(#e7b865, #9c622f);
+}
+
+.mascot[data-opponent="kim"] .mascot-eye {
+  background:
+    radial-gradient(circle at 48% 36%, white 0 10%, transparent 11%),
+    linear-gradient(to bottom, #10223c 0 28%, #1c9db4 29% 62%, #9ff5ff 63%);
+}
+
+.mascot[data-opponent="kim"] .mascot-body {
+  background: linear-gradient(110deg, #223b66, #17254c 62%, #10172f);
+}
+
+.mascot[data-opponent="kim"] .avatar-emblem {
+  background: linear-gradient(135deg, #ffcf6f, #56dff2);
+}
+
+.mascot[data-opponent="kim"] .accessory-left {
+  top: 50px;
+  left: 42px;
+  width: 28px;
+  height: 7px;
+  border-radius: 999px;
+  background: #72edff;
+  box-shadow: 0 0 10px #72edff;
+  transform: rotate(-22deg);
+}
+
+/* 刀龙 — crimson ponytails, horn-shaped clips and blade accents. */
+.mascot-stage[data-opponent="daolong"] {
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 105, 92, 0.24), transparent 31%),
+    linear-gradient(145deg, rgba(255, 185, 86, 0.1), transparent 55%),
+    #1c111d;
+}
+
+.mascot[data-opponent="daolong"] .mascot-hair-back,
+.mascot[data-opponent="daolong"] .hair-tail {
+  background: linear-gradient(145deg, #9e304b, #4b1835 68%, #260f26);
+}
+
+.mascot[data-opponent="daolong"] .mascot-bangs {
+  background: linear-gradient(145deg, #c74358, #5e1c3b 72%);
+}
+
+.mascot[data-opponent="daolong"] .mascot-body {
+  background: linear-gradient(110deg, #54233b, #28172d 62%, #170f20);
+}
+
+.mascot[data-opponent="daolong"] .uniform-line {
+  background: linear-gradient(#ffcf70, #ff665d);
+}
+
+.mascot[data-opponent="daolong"] .avatar-emblem {
+  background: linear-gradient(135deg, #ffbe59, #a62848);
+}
+
+.mascot[data-opponent="daolong"] .accessory-left,
+.mascot[data-opponent="daolong"] .accessory-right {
+  top: 32px;
+  width: 18px;
+  height: 30px;
+  background: linear-gradient(#ffd373, #d34a44);
+  clip-path: polygon(50% 0, 100% 100%, 0 76%);
+}
+
+.mascot[data-opponent="daolong"] .accessory-left {
+  left: 38px;
+  transform: rotate(-22deg);
+}
+
+.mascot[data-opponent="daolong"] .accessory-right {
+  right: 35px;
+  transform: scaleX(-1) rotate(-22deg);
+}
+
+/* tuch — mint engineering heroine with a small circuit visor. */
+.mascot-stage[data-opponent="tuch"] {
+  background:
+    linear-gradient(rgba(87, 255, 209, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(87, 255, 209, 0.05) 1px, transparent 1px),
+    radial-gradient(circle at 50% 18%, rgba(91, 245, 214, 0.22), transparent 31%),
+    #0e1b29;
+  background-size: 22px 22px, 22px 22px, auto, auto;
+}
+
+.mascot[data-opponent="tuch"] .mascot-hair-back,
+.mascot[data-opponent="tuch"] .hair-tail {
+  background: linear-gradient(145deg, #91efd8, #388f91 62%, #1f5369);
+}
+
+.mascot[data-opponent="tuch"] .mascot-bangs {
+  background: linear-gradient(145deg, #b8ffe6, #4ba0a0 72%);
+}
+
+.mascot[data-opponent="tuch"] .mascot-body {
+  background: linear-gradient(110deg, #245d72, #17374f 62%, #10263c);
+}
+
+.mascot[data-opponent="tuch"] .uniform-line {
+  background: linear-gradient(#b9ffe4, #50e5cc);
+}
+
+.mascot[data-opponent="tuch"] .avatar-emblem {
+  background: linear-gradient(135deg, #76f6d7, #427da9);
+}
+
+.mascot[data-opponent="tuch"] .accessory-right {
+  top: 52px;
+  right: 37px;
+  width: 34px;
+  height: 12px;
+  border: 2px solid #a7ffe8;
+  border-radius: 3px;
+  background: rgba(30, 69, 91, 0.88);
+  box-shadow:
+    inset 9px 0 0 rgba(92, 247, 214, 0.5),
+    0 0 12px rgba(92, 247, 214, 0.55);
+  transform: rotate(8deg);
+}
+
+/* peach — blossom-pink twin tails and flower clips. */
+.mascot-stage[data-opponent="peach"] {
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255, 170, 199, 0.27), transparent 32%),
+    radial-gradient(circle at 20% 70%, rgba(154, 255, 183, 0.12), transparent 25%),
+    #21142b;
+}
+
+.mascot[data-opponent="peach"] .mascot-hair-back,
+.mascot[data-opponent="peach"] .hair-tail {
+  background: linear-gradient(145deg, #ffb5c9, #d96899 62%, #853d78);
+}
+
+.mascot[data-opponent="peach"] .mascot-bangs {
+  background: linear-gradient(145deg, #ffd1dc, #df78a4 72%);
+}
+
+.mascot[data-opponent="peach"] .hair-tail {
+  width: 43px;
+  border-radius: 48% 52% 45% 55%;
+}
+
+.mascot[data-opponent="peach"] .mascot-eye {
+  background:
+    radial-gradient(circle at 48% 36%, white 0 10%, transparent 11%),
+    linear-gradient(to bottom, #281b3d 0 28%, #63a16e 29% 62%, #c5ffb8 63%);
+}
+
+.mascot[data-opponent="peach"] .mascot-body {
+  background: linear-gradient(110deg, #6e3e77, #3d285e 62%, #281c46);
+}
+
+.mascot[data-opponent="peach"] .avatar-emblem {
+  background: linear-gradient(135deg, #ffb7c9, #8fce86);
+}
+
+.mascot[data-opponent="peach"] .accessory-left {
+  top: 43px;
+  left: 36px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff2a8;
+  box-shadow:
+    9px 0 0 #ff9fbd,
+    -9px 0 0 #ff9fbd,
+    0 9px 0 #ffb5c9,
+    0 -9px 0 #ffb5c9,
+    0 0 14px rgba(255, 166, 197, 0.6);
+}
+
+/* 阿福 — black-haired final guardian with red-and-gold lucky ornaments. */
+.mascot-stage[data-opponent="afu"] {
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 202, 92, 0.24), transparent 31%),
+    linear-gradient(145deg, rgba(255, 74, 87, 0.16), transparent 55%),
+    #201018;
+}
+
+.mascot[data-opponent="afu"] .mascot-hair-back,
+.mascot[data-opponent="afu"] .hair-tail {
+  background: linear-gradient(145deg, #333349, #161522 66%, #090911);
+}
+
+.mascot[data-opponent="afu"] .mascot-bangs {
+  background: linear-gradient(145deg, #46465c, #1a1927 72%);
+}
+
+.mascot[data-opponent="afu"] .mascot-eye {
+  background:
+    radial-gradient(circle at 48% 36%, white 0 10%, transparent 11%),
+    linear-gradient(to bottom, #30171c 0 28%, #bd573c 29% 62%, #ffd178 63%);
+}
+
+.mascot[data-opponent="afu"] .mascot-body {
+  background: linear-gradient(110deg, #8e293b, #4c172b 62%, #2a1020);
+}
+
+.mascot[data-opponent="afu"] .uniform-line {
+  background: linear-gradient(#ffe59b, #ffb832);
+}
+
+.mascot[data-opponent="afu"] .uniform-gem {
+  background: #ffd166;
+  box-shadow: 0 0 17px #ffba38;
+}
+
+.mascot[data-opponent="afu"] .avatar-emblem {
+  border-color: #ffe3a0;
+  background: linear-gradient(135deg, #e83e4e, #ffbd39);
+  color: #fff7cf;
+}
+
+.mascot[data-opponent="afu"] .accessory-left,
+.mascot[data-opponent="afu"] .accessory-right {
+  top: 36px;
+  width: 25px;
+  height: 25px;
+  border: 4px solid #ef4650;
+  border-radius: 50%;
+  background: #ffd267;
+  box-shadow: 0 0 0 3px rgba(255, 207, 91, 0.2);
+}
+
+.mascot[data-opponent="afu"] .accessory-left {
+  left: 34px;
+}
+
+.mascot[data-opponent="afu"] .accessory-right {
+  right: 32px;
+}
+
+@media (max-width: 520px) {
+  .result-actions {
+    display: grid;
+  }
+
+  .result-actions .pixel-button {
+    width: 100%;
+  }
 }

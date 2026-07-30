@@ -113,7 +113,7 @@ function centerPreference(board, row, col) {
   return Math.max(0, board.length - Math.abs(row - center) - Math.abs(col - center));
 }
 
-function normalMove(board, candidates, rng) {
+function normalMove(board, candidates, rng, skill) {
   const winningMoves = immediateMoves(board, candidates, AI);
   if (winningMoves.length) return winningMoves[0];
 
@@ -143,7 +143,8 @@ function normalMove(board, candidates, rng) {
     })
     .sort((a, b) => b.score - a.score);
 
-  const pool = ranked.slice(0, Math.min(3, ranked.length));
+  const poolSize = Math.max(1, Math.min(7, Math.round(8 - skill * 7)));
+  const pool = ranked.slice(0, Math.min(poolSize, ranked.length));
   return pool[Math.floor(rng() * pool.length)] ?? ranked[0];
 }
 
@@ -186,10 +187,13 @@ function mercyMove(board, candidates, rng) {
   return pool[Math.floor(rng() * pool.length)] ?? ranked[0];
 }
 
-export function chooseAIMove(board, { mercy = false, rng = Math.random } = {}) {
+export function chooseAIMove(
+  board,
+  { mercy = false, rng = Math.random, skill = 0.72 } = {},
+) {
   const candidates = getCandidateMoves(board);
   if (!candidates.length) return null;
   return mercy
     ? mercyMove(board, candidates, rng)
-    : normalMove(board, candidates, rng);
+    : normalMove(board, candidates, rng, Math.max(0, Math.min(1, skill)));
 }

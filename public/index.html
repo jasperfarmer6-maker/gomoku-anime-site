@@ -17,10 +17,10 @@
       content="进入梦幻棋室，和原创棋手澪进行一场五子棋对决。"
     />
     <meta property="og:url" content="https://lulisslce.cc.cd/" />
-    <meta name="build-version" content="20260730-intersections-v2" />
+    <meta name="build-version" content="20260730-five-stage-v1" />
     <title>棋境少女｜在线五子棋</title>
     <link rel="icon" href="/assets/favicon.svg?v=20260730-2" type="image/svg+xml" />
-    <link rel="stylesheet" href="/styles.css?v=20260730-2" />
+    <link rel="stylesheet" href="/styles.css?v=20260730-3" />
     <style>
       /*
        * Critical board alignment is kept inline so an older cached stylesheet
@@ -34,7 +34,7 @@
         background-repeat: repeat, repeat, no-repeat !important;
       }
     </style>
-    <script type="module" src="/js/app.js?v=20260730-2"></script>
+    <script type="module" src="/js/app.js?v=20260730-3"></script>
   </head>
   <body>
     <a class="skip-link" href="#game">跳到棋盘</a>
@@ -70,7 +70,7 @@
       <main>
         <section class="intro" aria-labelledby="page-title">
           <div>
-            <p class="eyebrow"><span></span> A QUIET AFTERNOON · GAME 01</p>
+            <p class="eyebrow"><span></span> A QUIET AFTERNOON · <b id="eyebrow-level">GAME 01</b></p>
             <h1 id="page-title">在交叉点上，<br /><em>连成你的胜利。</em></h1>
           </div>
           <p class="intro-copy">
@@ -82,7 +82,7 @@
         <section class="game-layout" id="game" aria-label="五子棋游戏">
           <aside class="player-panel opponent-panel" aria-label="AI 对手">
             <div class="panel-label">
-              <span>PLAYER 02</span>
+              <span id="level-label">第 1 / 5 关</span>
               <span class="online-dot"></span>
             </div>
 
@@ -95,9 +95,13 @@
                 class="mascot"
                 id="mascot"
                 data-mood="happy"
+                data-opponent="kim"
                 role="img"
-                aria-label="原创动漫棋手澪"
+                aria-label="原创女性动漫棋手 Kim"
               >
+                <span class="avatar-emblem" aria-hidden="true">K</span>
+                <span class="hair-accessory accessory-left" aria-hidden="true"></span>
+                <span class="hair-accessory accessory-right" aria-hidden="true"></span>
                 <div class="mascot-hair-back"></div>
                 <div class="mascot-neck"></div>
                 <div class="mascot-body">
@@ -125,15 +129,15 @@
 
             <div class="opponent-info">
               <div>
-                <p class="character-name">澪 <span>MIO</span></p>
-                <p class="character-title">星夜棋馆 · 特邀棋手</p>
+                <p class="character-name" id="opponent-name">Kim <span>KIM</span></p>
+                <p class="character-title" id="opponent-title">霓光棋社 · 新锐棋手</p>
               </div>
-              <span class="rank-badge">AI · 中等</span>
+              <span class="rank-badge" id="opponent-rank">AI · 新锐</span>
             </div>
 
             <div class="speech-bubble">
               <span aria-hidden="true">◆</span>
-              <p id="mascot-bubble">五颗连成线就赢。你先来！</p>
+              <p id="mascot-bubble">我是 Kim。第一关，就从轻松的一手开始吧！</p>
             </div>
           </aside>
 
@@ -161,7 +165,7 @@
 
             <div class="board-help">
               <span><i class="stone-key black"></i> 你 · 黑子</span>
-              <span><i class="stone-key white"></i> 澪 · 白子</span>
+              <span><i class="stone-key white"></i> <b id="board-opponent-name">Kim</b> · 白子</span>
               <span class="keyboard-hint">方向键移动 · ENTER 落子</span>
             </div>
           </div>
@@ -185,6 +189,11 @@
               </div>
             </div>
 
+            <div class="info-block campaign-block">
+              <p class="panel-kicker">五关进度</p>
+              <div class="campaign-progress" id="campaign-progress" aria-label="五关进度"></div>
+            </div>
+
             <div class="info-block rule-block">
               <p class="panel-kicker">游戏规则</p>
               <ol>
@@ -196,7 +205,7 @@
 
             <div class="privacy-note">
               <span aria-hidden="true">▣</span>
-              <p>战绩仅保存在你的浏览器中，不会上传。</p>
+              <p>战绩与关卡进度仅保存在你的浏览器中，不会上传。</p>
             </div>
           </aside>
         </section>
@@ -211,12 +220,17 @@
     <dialog class="result-overlay" id="result-overlay">
       <div class="result-card">
         <span class="result-glyph" aria-hidden="true">✦</span>
-        <p class="panel-kicker">GAME RESULT</p>
+        <p class="panel-kicker" id="result-kicker">GAME RESULT</p>
         <h2 id="result-title">YOU WIN!</h2>
         <p id="result-copy">五颗黑子连成一线。</p>
-        <button class="pixel-button primary large" id="result-button" type="button">
-          再来一局 <span aria-hidden="true">→</span>
-        </button>
+        <div class="result-actions">
+          <button class="pixel-button primary large" id="result-button" type="button">
+            再来一局 <span aria-hidden="true">→</span>
+          </button>
+          <button class="pixel-button large" id="save-rest-button" type="button" hidden>
+            存档休息
+          </button>
+        </div>
       </div>
     </dialog>
   </body>
