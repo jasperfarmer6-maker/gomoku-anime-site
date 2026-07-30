@@ -36,6 +36,7 @@ let focusedIndex = Math.floor(BOARD_SIZE / 2) * BOARD_SIZE + Math.floor(BOARD_SI
 let audioEnabled = JSON.parse(localStorage.getItem(AUDIO_KEY) ?? "true");
 let stats = loadStats();
 let mercyGame = stats.mercyPending;
+let aiTimer = null;
 
 function loadStats() {
   const defaults = {
@@ -58,8 +59,8 @@ function saveStats() {
 }
 
 function setMascotMood(mood, message) {
-  if (mascot) mascot.dataset.mood = mood;
-  if (mascotBubble) mascotBubble.textContent = message;
+  mascot.dataset.mood = mood;
+  mascotBubble.textContent = message;
 }
 
 function setStatus(message, state = "ready") {
@@ -75,7 +76,7 @@ function updateStats() {
 
 function updateAudioButton() {
   audioButton.setAttribute("aria-pressed", String(audioEnabled));
-  audioButton.querySelector(".audio-label").textContent = audioEnabled ? "音效开启" : "音效关闭";
+  audioButton.querySelector(".audio-label").textContent = audioEnabled ? "音效 ON" : "音效 OFF";
   audioButton.querySelector(".audio-icon").textContent = audioEnabled ? "♪" : "×";
 }
 
@@ -84,18 +85,22 @@ function playTone(frequency, duration = 0.08, type = "square", volume = 0.04) {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   if (!AudioContext) return;
 
-  const context = new AudioContext();
-  const oscillator = context.createOscillator();
-  const gain = context.createGain();
-  oscillator.type = type;
-  oscillator.frequency.value = frequency;
-  gain.gain.setValueAtTime(volume, context.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + duration);
-  oscillator.connect(gain);
-  gain.connect(context.destination);
-  oscillator.start();
-  oscillator.stop(context.currentTime + duration);
-  oscillator.addEventListener("ended", () => context.close());
+  try {
+    const context = new AudioContext();
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = type;
+    oscillator.frequency.value = frequency;
+    gain.gain.setValueAtTime(volume, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + duration);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start();
+    oscillator.stop(context.currentTime + duration);
+    oscillator.addEventListener("ended", () => context.close());
+  } catch (error) {
+    console.warn("音效播放失败，游戏将继续运行。", error);
+  }
 }
 
 function renderBoard() {
@@ -149,7 +154,7 @@ function finishGame(result) {
     stats.mercyPending = false;
     setStatus("胜利！这一手漂亮。", "win");
     setMascotMood("surprised", "欸？！这条线是什么时候连起来的！");
-    resultTitle.textContent = "你赢了";
+    resultTitle.textContent = "YOU WIN!";
     resultCopy.textContent = "五颗黑子连成一线。棋盘记住了你的名字。";
     playTone(784, 0.16, "square", 0.05);
     window.setTimeout(() => playTone(1046, 0.22, "square", 0.045), 90);
@@ -159,14 +164,14 @@ function finishGame(result) {
     if (stats.consecutiveLosses >= 2) stats.mercyPending = true;
     setStatus("本局惜败，再来一次？", "lose");
     setMascotMood("smug", "承让啦。再下一局，我可不会大意……");
-    resultTitle.textContent = "再试一次";
+    resultTitle.textContent = "TRY AGAIN";
     resultCopy.textContent = "白子先连成五颗。观察交叉点，再挑战一次吧。";
     playTone(196, 0.25, "sawtooth", 0.035);
   } else {
     stats.draws += 1;
     setStatus("棋盘已满，平局！", "draw");
     setMascotMood("happy", "能下满整张棋盘，也是一种默契。");
-    resultTitle.textContent = "平局";
+    resultTitle.textContent = "DRAW";
     resultCopy.textContent = "没有空位了。这是一场势均力敌的对局。";
     playTone(440, 0.18, "triangle", 0.04);
   }
@@ -199,14 +204,40 @@ function onPlayerMove(event) {
 
   aiThinking = true;
   setStatus("AI 正在计算落点…", "thinking");
-  setMascotMood("thinking", "嗯……这条线有点危险。");
+  setMascotMood("thinking", "让我看看……你这一步很有想法。");
   renderBoard();
-  window.setTimeout(runAI, 380 + Math.random() * 420);
+  aiTimer = window.setTimeout(runAI, 260 + Math.random() * 240);
 }
 
 function runAI() {
-  if (gameOver) return;
-  const move = chooseAIMove(board, { mercy: mercyGame });
+  aiTimer = null;
+  if (gameOver || !aiThinking) return;
+
+  let move = null;
+  try {
+    move = chooseAIMove(board, { mercy: mercyGame });
+  } catch (error) {
+    console.error("AI 落子计算失败，将使用备用落点。", error);
+  }
+
+  if (!move) {
+    const center = Math.floor(BOARD_SIZE / 2);
+    const legalMoves = [];
+    for (let row = 0; row < BOARD_SIZE; row += 1) {
+      for (let col = 0; col < BOARD_SIZE; col += 1) {
+        if (board[row][col] === EMPTY) {
+          legalMoves.push({
+            row,
+            col,
+            distance: Math.abs(row - center) + Math.abs(col - center),
+          });
+        }
+      }
+    }
+    legalMoves.sort((a, b) => a.distance - b.distance);
+    move = legalMoves[0] ?? null;
+  }
+
   if (!move) {
     finishGame("draw");
     return;
@@ -227,20 +258,24 @@ function runAI() {
   }
 
   setStatus("轮到你了 · 黑子", "ready");
-  setMascotMood("happy", "轮到你。别只盯着一条线哦！");
+  setMascotMood("happy", "轮到你了。让我看看你的下一手。");
   renderBoard();
 }
 
 function newGame() {
+  if (aiTimer !== null) {
+    window.clearTimeout(aiTimer);
+    aiTimer = null;
+  }
   board = createBoard();
   gameOver = false;
   aiThinking = false;
   lastMove = null;
   mercyGame = stats.mercyPending;
   focusedIndex = Math.floor(BOARD_SIZE / 2) * BOARD_SIZE + Math.floor(BOARD_SIZE / 2);
-  resultOverlay.close();
+  if (resultOverlay.open) resultOverlay.close();
   setStatus("轮到你了 · 黑子", "ready");
-  setMascotMood("happy", "五颗连成线就赢。你先来！");
+  setMascotMood("happy", "初次见面，我是澪。请先落子吧！");
   renderBoard();
 }
 

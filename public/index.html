@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="棋境是一款简洁、安静的在线五子棋小游戏。执黑先行，挑战中等难度 AI。"
+      content="棋境少女是一款动漫风在线五子棋小游戏。执黑先行，与原创棋手澪展开对局。"
     />
-    <meta name="theme-color" content="#f7f5ef" />
+    <meta name="theme-color" content="#090b1a" />
     <link rel="canonical" href="https://lulisslce.cc.cd/" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="zh_CN" />
-    <meta property="og:title" content="棋境｜在线五子棋" />
+    <meta property="og:title" content="棋境少女｜在线五子棋" />
     <meta
       property="og:description"
-      content="一个轻盈、专注的在线五子棋对局。"
+      content="进入梦幻棋室，和原创棋手澪进行一场五子棋对决。"
     />
     <meta property="og:url" content="https://lulisslce.cc.cd/" />
-    <title>棋境｜在线五子棋</title>
+    <title>棋境少女｜在线五子棋</title>
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/styles.css" />
     <script type="module" src="/js/app.js"></script>
@@ -25,24 +25,29 @@
   <body>
     <a class="skip-link" href="#game">跳到棋盘</a>
 
+    <div class="ambient-petals" aria-hidden="true"></div>
     <div class="page-shell">
       <header class="topbar">
-        <a class="brand" href="/" aria-label="棋境首页">
-          <span class="brand-mark" aria-hidden="true"></span>
-          <span>棋境</span>
+        <a class="brand" href="/" aria-label="棋境少女首页">
+          <span class="brand-gem" aria-hidden="true"></span>
+          <span>
+            <strong>棋境少女</strong>
+            <small>GOMOKU STORY</small>
+          </span>
         </a>
 
         <div class="topbar-actions">
           <button
-            class="quiet-button audio-button"
+            class="pixel-button audio-button"
             id="audio-button"
             type="button"
             aria-pressed="true"
           >
             <span class="audio-icon" aria-hidden="true">♪</span>
-            <span class="audio-label">音效开启</span>
+            <span class="audio-label">音效 ON</span>
           </button>
-          <button class="primary-button" id="restart-button" type="button">
+          <button class="pixel-button primary" id="restart-button" type="button">
+            <span aria-hidden="true">↻</span>
             重新开局
           </button>
         </div>
@@ -50,24 +55,88 @@
 
       <main>
         <section class="intro" aria-labelledby="page-title">
-          <p class="eyebrow">GOMOKU · 15 × 15</p>
-          <h1 id="page-title">留一点空白，<br />看清下一步。</h1>
+          <div>
+            <p class="eyebrow"><span></span> A QUIET AFTERNOON · GAME 01</p>
+            <h1 id="page-title">在交叉点上，<br /><em>连成你的胜利。</em></h1>
+          </div>
           <p class="intro-copy">
             你执黑先行。横、竖或斜线率先连成五颗棋子即可获胜。
+            对面的少女棋手，似乎比看起来更会计算。
           </p>
         </section>
 
         <section class="game-layout" id="game" aria-label="五子棋游戏">
+          <aside class="player-panel opponent-panel" aria-label="AI 对手">
+            <div class="panel-label">
+              <span>PLAYER 02</span>
+              <span class="online-dot"></span>
+            </div>
+
+            <div class="mascot-stage">
+              <div class="pixel-spark spark-one" aria-hidden="true"></div>
+              <div class="pixel-spark spark-two" aria-hidden="true"></div>
+              <div class="pixel-spark spark-three" aria-hidden="true"></div>
+
+              <div
+                class="mascot"
+                id="mascot"
+                data-mood="happy"
+                role="img"
+                aria-label="原创动漫棋手澪"
+              >
+                <div class="mascot-hair-back"></div>
+                <div class="mascot-neck"></div>
+                <div class="mascot-body">
+                  <span class="uniform-line line-left"></span>
+                  <span class="uniform-line line-right"></span>
+                  <span class="uniform-gem"></span>
+                </div>
+                <div class="mascot-head">
+                  <span class="mascot-ear ear-left"></span>
+                  <span class="mascot-ear ear-right"></span>
+                  <span class="mascot-bangs"></span>
+                  <span class="mascot-eye eye-left"></span>
+                  <span class="mascot-eye eye-right"></span>
+                  <span class="mascot-mouth"></span>
+                  <span class="cheek cheek-left"></span>
+                  <span class="cheek cheek-right"></span>
+                </div>
+                <div class="hair-tail tail-left"></div>
+                <div class="hair-tail tail-right"></div>
+                <div class="mascot-hand">
+                  <span class="held-stone"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="opponent-info">
+              <div>
+                <p class="character-name">澪 <span>MIO</span></p>
+                <p class="character-title">星夜棋馆 · 特邀棋手</p>
+              </div>
+              <span class="rank-badge">AI · 中等</span>
+            </div>
+
+            <div class="speech-bubble">
+              <span aria-hidden="true">◆</span>
+              <p id="mascot-bubble">五颗连成线就赢。你先来！</p>
+            </div>
+          </aside>
+
           <div class="board-panel">
             <div class="status-bar" aria-live="polite">
               <div>
                 <span class="status-dot" data-state="ready"></span>
                 <strong id="game-status">轮到你了 · 黑子</strong>
               </div>
-              <span>中等难度</span>
+              <span>15 × 15</span>
             </div>
 
             <div class="board-frame">
+              <div class="corner corner-tl" aria-hidden="true"></div>
+              <div class="corner corner-tr" aria-hidden="true"></div>
+              <div class="corner corner-bl" aria-hidden="true"></div>
+              <div class="corner corner-br" aria-hidden="true"></div>
               <div
                 class="game-board"
                 id="board"
@@ -77,15 +146,15 @@
             </div>
 
             <div class="board-help">
-              <span><i class="stone-key black"></i> 你</span>
-              <span><i class="stone-key white"></i> AI</span>
+              <span><i class="stone-key black"></i> 你 · 黑子</span>
+              <span><i class="stone-key white"></i> 澪 · 白子</span>
               <span class="keyboard-hint">方向键移动 · ENTER 落子</span>
             </div>
           </div>
 
           <aside class="info-panel" aria-label="游戏信息">
             <div class="info-block">
-              <p class="section-label">本地战绩</p>
+              <p class="panel-kicker">战绩记录</p>
               <div class="stats-grid">
                 <div>
                   <strong id="wins">0</strong>
@@ -103,34 +172,36 @@
             </div>
 
             <div class="info-block rule-block">
-              <p class="section-label">规则</p>
+              <p class="panel-kicker">游戏规则</p>
               <ol>
-                <li><span>1</span>点击交叉点落下黑子</li>
-                <li><span>2</span>双方轮流落子</li>
-                <li><span>3</span>率先连成五颗获胜</li>
+                <li><span>01</span>点击棋盘交叉点落下黑子</li>
+                <li><span>02</span>双方轮流落子，不可重复</li>
+                <li><span>03</span>率先连成五颗棋子获胜</li>
               </ol>
             </div>
 
             <div class="privacy-note">
-              战绩仅保存在当前浏览器，不会上传。
+              <span aria-hidden="true">▣</span>
+              <p>战绩仅保存在你的浏览器中，不会上传。</p>
             </div>
           </aside>
         </section>
       </main>
 
       <footer>
-        <span>棋境 © 2026</span>
-        <span>无需登录 · 专注对弈</span>
+        <span>棋境少女 © 2026</span>
+        <span>A SMALL STORY BETWEEN BLACK &amp; WHITE</span>
       </footer>
     </div>
 
     <dialog class="result-overlay" id="result-overlay">
       <div class="result-card">
-        <p class="section-label">本局结果</p>
-        <h2 id="result-title">你赢了</h2>
+        <span class="result-glyph" aria-hidden="true">✦</span>
+        <p class="panel-kicker">GAME RESULT</p>
+        <h2 id="result-title">YOU WIN!</h2>
         <p id="result-copy">五颗黑子连成一线。</p>
-        <button class="primary-button large" id="result-button" type="button">
-          再来一局
+        <button class="pixel-button primary large" id="result-button" type="button">
+          再来一局 <span aria-hidden="true">→</span>
         </button>
       </div>
     </dialog>
