@@ -10,8 +10,8 @@ import {
 } from "./game-engine.js";
 import { chooseAIMove } from "./ai.js";
 
-const STORAGE_KEY = "pixelGomoku.stats.v1";
-const AUDIO_KEY = "pixelGomoku.audio.v1";
+const STORAGE_KEY = "animeGomoku.stats.v1";
+const AUDIO_KEY = "animeGomoku.audio.v1";
 
 const boardElement = document.querySelector("#board");
 const statusElement = document.querySelector("#game-status");
