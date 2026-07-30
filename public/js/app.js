@@ -58,8 +58,8 @@ function saveStats() {
 }
 
 function setMascotMood(mood, message) {
-  mascot.dataset.mood = mood;
-  mascotBubble.textContent = message;
+  if (mascot) mascot.dataset.mood = mood;
+  if (mascotBubble) mascotBubble.textContent = message;
 }
 
 function setStatus(message, state = "ready") {
@@ -75,7 +75,7 @@ function updateStats() {
 
 function updateAudioButton() {
   audioButton.setAttribute("aria-pressed", String(audioEnabled));
-  audioButton.querySelector(".audio-label").textContent = audioEnabled ? "音效 ON" : "音效 OFF";
+  audioButton.querySelector(".audio-label").textContent = audioEnabled ? "音效开启" : "音效关闭";
   audioButton.querySelector(".audio-icon").textContent = audioEnabled ? "♪" : "×";
 }
 
@@ -149,7 +149,7 @@ function finishGame(result) {
     stats.mercyPending = false;
     setStatus("胜利！这一手漂亮。", "win");
     setMascotMood("surprised", "欸？！这条线是什么时候连起来的！");
-    resultTitle.textContent = "YOU WIN!";
+    resultTitle.textContent = "你赢了";
     resultCopy.textContent = "五颗黑子连成一线。棋盘记住了你的名字。";
     playTone(784, 0.16, "square", 0.05);
     window.setTimeout(() => playTone(1046, 0.22, "square", 0.045), 90);
@@ -159,14 +159,14 @@ function finishGame(result) {
     if (stats.consecutiveLosses >= 2) stats.mercyPending = true;
     setStatus("本局惜败，再来一次？", "lose");
     setMascotMood("smug", "承让啦。再下一局，我可不会大意……");
-    resultTitle.textContent = "TRY AGAIN";
+    resultTitle.textContent = "再试一次";
     resultCopy.textContent = "白子先连成五颗。观察交叉点，再挑战一次吧。";
     playTone(196, 0.25, "sawtooth", 0.035);
   } else {
     stats.draws += 1;
     setStatus("棋盘已满，平局！", "draw");
     setMascotMood("happy", "能下满整张棋盘，也是一种默契。");
-    resultTitle.textContent = "DRAW";
+    resultTitle.textContent = "平局";
     resultCopy.textContent = "没有空位了。这是一场势均力敌的对局。";
     playTone(440, 0.18, "triangle", 0.04);
   }
