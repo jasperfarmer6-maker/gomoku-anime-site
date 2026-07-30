@@ -8,7 +8,7 @@ export const OPPONENTS = Object.freeze([
     skill: 0.42,
     intro: "我是 Kim。第一关，就从轻松的一手开始吧！",
     thinking: "这一步很亮眼……让我换个角度。",
-    turn: "轮到你了。别被我的霓光发夹分心哦。",
+    turn: "轮到你了。第一关也要看清每个交叉点哦。",
     surprised: "漂亮！第一枚通关徽章属于你。",
     smug: "差一点就抓住节奏了，再试一次吧。",
   },

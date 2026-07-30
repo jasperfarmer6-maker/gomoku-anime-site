@@ -83,7 +83,7 @@ function saveStats() {
 }
 
 function setMascotMood(mood, message) {
-  mascot.dataset.mood = mood;
+  if (mascot) mascot.dataset.mood = mood;
   mascotBubble.textContent = message;
 }
 
@@ -124,15 +124,11 @@ function updateOpponent() {
   opponentTitle.textContent = currentOpponent.title;
   opponentRank.textContent = currentOpponent.rank;
   boardOpponentName.textContent = currentOpponent.name;
-  mascot.dataset.opponent = currentOpponent.id;
-  mascotStage.dataset.opponent = currentOpponent.id;
-  mascot.setAttribute("aria-label", `原创女性动漫棋手 ${currentOpponent.name}`);
-  mascot.querySelector(".avatar-emblem").textContent =
-    currentOpponent.id === "daolong"
-      ? "刃"
-      : currentOpponent.id === "afu"
-        ? "福"
-        : currentOpponent.name.slice(0, 1).toUpperCase();
+  if (mascot) {
+    mascot.dataset.opponent = currentOpponent.id;
+    mascot.setAttribute("aria-label", `原创女性动漫棋手 ${currentOpponent.name}`);
+  }
+  if (mascotStage) mascotStage.dataset.opponent = currentOpponent.id;
   renderCampaignProgress();
 }
 
